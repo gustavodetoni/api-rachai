@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: rachai-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5444/racha
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: seu-email@gmail.com
+    password: sua-senha-de-app
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: sua-chave-secreta-muito-segura-aqui-com-no-minimo-256-bits-para-maior-seguranca
+  expiration: 86400000
+
+app:
+  frontend:
+    url: http://localhost:3000
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
