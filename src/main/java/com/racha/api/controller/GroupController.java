@@ -3,6 +3,7 @@ package com.racha.api.controller;
 import com.racha.api.dto.group.CreateGroupRequest;
 import com.racha.api.dto.group.GroupResponse;
 import com.racha.api.usecase.group.CreateGroupUseCase;
+import com.racha.api.usecase.group.GetGroupUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,19 +27,21 @@ import java.util.UUID;
 public class GroupController {
 
     private final CreateGroupUseCase createGroupUseCase;
+    private final GetGroupUseCase getGroupUseCase;
     private final AuthenticationUtil authenticationUtil;
 
-//    @GetMapping("/groups")
-//    @Operation(
-//            summary = "Buscar grupos",
-//            description = "Informações sobre grupos do usuário",
-//            security = @SecurityRequirement(name = "Bearer Authentication")
-//    )
-//    public ResponseEntity<User> getGroups(HttpServletRequest request) {
-//        UUID userId = authenticationUtil.getUserIdFromRequest(request);
-//
-//        return ResponseEntity.ok();
-//    }
+    @GetMapping("/groups")
+    @Operation(
+            summary = "Buscar grupos",
+            description = "Informações sobre grupos do usuário",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<List<GroupResponse>> getGroups(HttpServletRequest request) {
+        UUID userId = authenticationUtil.getUserIdFromRequest(request);
+        List<GroupResponse> groups = getGroupUseCase.execute(userId);
+
+        return ResponseEntity.ok(groups);
+    }
 
     @PostMapping(path = "/groups", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(

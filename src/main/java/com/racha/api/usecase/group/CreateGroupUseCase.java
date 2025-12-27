@@ -1,7 +1,9 @@
 package com.racha.api.usecase.group;
 
 import com.racha.api.domain.entity.Group;
+import com.racha.api.domain.entity.GroupMember;
 import com.racha.api.domain.entity.User;
+import com.racha.api.domain.repository.GroupMemberRepository;
 import com.racha.api.domain.repository.GroupRepository;
 import com.racha.api.domain.repository.UserRepository;
 import com.racha.api.dto.group.CreateGroupRequest;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class CreateGroupUseCase {
 
     private final GroupRepository groupRepository;
+    private final GroupMemberRepository groupMemberRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
 
@@ -43,6 +46,13 @@ public class CreateGroupUseCase {
                 .build();
 
         group = groupRepository.save(group);
+
+        GroupMember groupMember = GroupMember.builder()
+                .group(group)
+                .user(user)
+                .build();
+
+        groupMemberRepository.save(groupMember);
 
         return GroupResponse.builder()
                 .id(group.getId())

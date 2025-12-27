@@ -13,5 +13,7 @@ public interface GroupRepository {
 
     List<Group> findByOwnerId(UUID ownerId);
 
+    List<Group> findByUserId(UUID userId);
+
     void delete(Group group);
 }
