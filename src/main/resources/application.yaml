@@ -33,6 +33,12 @@ spring:
           starttls:
             enable: true
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 server:
   port: 8080
 
@@ -43,6 +49,14 @@ jwt:
 app:
   frontend:
     url: http://localhost:3000
+
+aws:
+  s3:
+    bucket-name: rachai-bucket
+    region: us-east-1
+    access-key: YOUR_ACCESS_KEY
+    secret-key: YOUR_SECRET_KEY
+    base-url: https://rachai-bucket.s3.us-east-1.amazonaws.com
 
 springdoc:
   api-docs:

@@ -36,13 +36,25 @@ public class JwtTokenProvider {
     }
 
     public UUID getUserIdFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
 
-        return UUID.fromString(claims.getSubject());
+            return UUID.fromString(claims.getSubject());
+        } catch (ExpiredJwtException e) {
+            throw new JwtException("Token expirado", e);
+        } catch (UnsupportedJwtException e) {
+            throw new JwtException("Token não suportado", e);
+        } catch (MalformedJwtException e) {
+            throw new JwtException("Token malformado", e);
+        } catch (IllegalArgumentException e) {
+            throw new JwtException("Token inválido", e);
+        } catch (JwtException e) {
+            throw new JwtException("Erro ao processar token", e);
+        }
     }
 
     public String getEmailFromToken(String token) {
