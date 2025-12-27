@@ -54,9 +54,10 @@ aws:
   s3:
     bucket-name: rachai-bucket
     region: us-east-1
-    access-key: YOUR_ACCESS_KEY
-    secret-key: YOUR_SECRET_KEY
-    base-url: https://rachai-bucket.s3.us-east-1.amazonaws.com
+    access-key: minio
+    secret-key: minio123
+    endpoint: http://localhost:9000 # minIO apenas
+    base-url: http://localhost:9000/rachai-bucket
 
 springdoc:
   api-docs:
