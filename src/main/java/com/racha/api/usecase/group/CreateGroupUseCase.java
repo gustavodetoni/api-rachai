@@ -26,7 +26,8 @@ public class CreateGroupUseCase {
     private final UserRepository userRepository;
     private final S3Service s3Service;
 
-    public GroupResponse execute(CreateGroupRequest request, MultipartFile thumbnail, UUID userId) {
+    public GroupResponse execute(CreateGroupRequest request, UUID userId) {
+        MultipartFile thumbnail = request.getThumbnail();
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException("Usuário não encontrado", HttpStatus.NOT_FOUND));
 

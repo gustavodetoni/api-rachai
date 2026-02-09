@@ -1,8 +1,10 @@
 package com.racha.api.controller;
 
+import com.racha.api.dto.user.UserResponse;
 import com.racha.api.dto.group.CreateGroupRequest;
 import com.racha.api.dto.group.GroupResponse;
 import com.racha.api.usecase.group.CreateGroupUseCase;
+import com.racha.api.usecase.group.GetGroupMembersUseCase;
 import com.racha.api.usecase.group.GetGroupUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,6 +30,7 @@ public class GroupController {
 
     private final CreateGroupUseCase createGroupUseCase;
     private final GetGroupUseCase getGroupUseCase;
+    private final GetGroupMembersUseCase getGroupMembersUseCase;
     private final AuthenticationUtil authenticationUtil;
 
     @GetMapping("/groups")
@@ -51,12 +54,23 @@ public class GroupController {
     )
     public ResponseEntity<GroupResponse> createGroup(
             @Valid @ModelAttribute CreateGroupRequest request,
-            @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail,
             HttpServletRequest httpRequest) {
 
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
-        GroupResponse response = createGroupUseCase.execute(request, thumbnail, userId);
+        GroupResponse response = createGroupUseCase.execute(request, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/groups/{groupId}/members")
+    @Operation(
+            summary = "Buscar membros de um grupo determinado",
+            description = "Membros do grupo determinado",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<List<UserResponse>> getMembersByGroup(HttpServletRequest request, @PathVariable UUID groupId) {
+        List<UserResponse> members = getGroupMembersUseCase.execute(groupId);
+
+        return ResponseEntity.status(HttpStatus.OK).body(members);
     }
 }

@@ -1,0 +1,78 @@
+# Contexto do projeto "Racha Aí" para assistentes de IA.
+# Formato: YAML para otimização de tokens.
+
+rules: "Não coloque comentario no codigo. Caso você adicionou algo que foi removido, não adicione, somente se foi pedido."
+
+business_logic:
+  description: >
+    O "Racha Aí" é um backend para um aplicativo de divisão de despesas.
+    A função principal é permitir que usuários criem grupos, adicionem amigos e registrem despesas.
+    A aplicação calcula e gerencia as dívidas de forma automática, facilitando o acerto de contas entre os membros.
+  features:
+    - "Autenticação de Usuários: Registro, login e recuperação de senha."
+    - "Gerenciamento de Grupos: Criação de grupos com nome, descrição e dono."
+    - "Gerenciamento de Despesas: Um membro pode registrar uma despesa e dividi-la igualmente entre todos ou apenas com alguns membros do grupo."
+    - "Rastreamento de Dívidas: A aplicação calcula o que cada usuário deve e para quem, com base nas despesas."
+    - "Confirmação de Pagamento: Usuários podem marcar suas partes de uma dívida como 'pagas'."
+
+project_structure:
+  description: "A arquitetura é baseada em camadas, com uma clara separação de responsabilidades para promover organização e manutenibilidade."
+  directories:
+    "src/main/java/com/racha/api/":
+      config: "Contém todas as configurações do Spring Framework. Inclui segurança (SecurityConfig, JWT), CORS, integração com serviços (AWS S3) e documentação da API (OpenApiConfig)."
+      controller: "A camada de API (REST). Recebe requisições HTTP, usa `AuthenticationUtil` para identificar o usuário e delega a execução para os `UseCases`."
+      domain:
+        description: "O coração da aplicação, contendo os modelos de dados e as regras de negócio essenciais."
+        entity: "Classes que mapeiam as tabelas do banco de dados (JPA Entities). Ex: `User`, `Group`, `Expense`."
+        repository: "Interfaces do Spring Data JPA que definem os métodos de contrato para acesso ao banco de dados (CRUD e queries customizadas)."
+      dto: "Data Transfer Objects. Define os 'contratos' JSON para as requisições (`*Request`) e respostas (`*Response`) da API, garantindo uma comunicação clara com o frontend."
+      expection: "Tratamento de exceções. `BusinessException` é usada para erros de regra de negócio. `GlobalExceptionHandler` captura exceções e padroniza as respostas de erro da API."
+      infra: "Implementações de componentes de infraestrutura. Principalmente, contém as implementações concretas dos repositórios JPA (ex: `JpaUserRepository`) que implementam as interfaces do `domain/repository`."
+      service: "Serviços de suporte que encapsulam funcionalidades reutilizáveis e transversais, como envio de e-mails (`EmailService`), upload de arquivos para S3 (`S3Service`) e gerenciamento de tokens (`TokenService`)."
+      usecase: "Orquestra a lógica de negócio. Cada classe representa um caso de uso específico e bem definido (ex: criar um grupo, adicionar uma despesa), garantindo que a lógica de negócio seja centralizada e reutilizável."
+      util: "Classes utilitárias. `AuthenticationUtil`, por exemplo, é usada para extrair o ID do usuário autenticado a partir do token JWT na requisição HTTP."
+    "src/main/resources/":
+      application.yaml: "Arquivo principal de configuração da aplicação (conexão com banco de dados, segredos de JWT, chaves da AWS, etc)."
+      "db/migration": "Contém os scripts SQL para migração do banco de dados, gerenciados pelo Flyway. Cada arquivo `V*__*.sql` representa uma evolução do schema."
+
+conventions:
+  naming:
+    - pattern: "*Controller.java"
+      description: "Controladores REST. Ex: `ExpenseController`."
+    - pattern: "*UseCase.java"
+      description: "Classes que contêm a lógica de um caso de uso. Ex: `CreateGroupUseCase`."
+    - pattern: "*Repository.java"
+      description: "Interfaces de repositório Spring Data JPA. Ex: `GroupRepository`."
+    - pattern: "*Request.java / *Response.java"
+      description: "DTOs para a camada de API. Ex: `CreateExpenseRequest`, `GroupResponse`."
+  coding_style:
+    - practice: "Injeção de Dependência via Construtor"
+      description: "As dependências são declaradas como `final` e injetadas pelo construtor, utilizando a anotação `@RequiredArgsConstructor` do Lombok para um código mais limpo."
+    - practice: "Exceções para Regras de Negócio"
+      description: "A exceção `BusinessException` é lançada nos `UseCases` sempre que uma regra de negócio é violada, permitindo um tratamento de erro claro e centralizado no `GlobalExceptionHandler`."
+  code_examples:
+    controller: |
+      // Um controller extrai o ID do usuário autenticado e delega a ação para o use case correspondente.
+      @PostMapping("/expense/{groupId}")
+      public ResponseEntity<ExpenseResponse> createExpense(
+              @PathVariable UUID groupId,
+              @Valid @RequestBody CreateExpenseRequest request,
+              HttpServletRequest httpRequest) {
+          UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
+          ExpenseResponse response = createExpenseUseCase.execute(groupId, request, userId);
+          return ResponseEntity.status(HttpStatus.CREATED).body(response);
+      }
+    usecase: |
+      // Um use case encapsula uma lógica de negócio completa, recebendo dados primitivos e DTOs,
+      // e orquestrando os repositórios para executar a ação.
+      @Service
+      @RequiredArgsConstructor
+      public class CreateExpenseUseCase {
+          private final ExpenseRepository expenseRepository;
+          // ... outros repositórios
+
+          @Transactional
+          public ExpenseResponse execute(UUID groupId, CreateExpenseRequest request, UUID userId) {
+              // ... lógica para validar, criar a despesa e dividi-la entre os membros.
+          }
+      }
