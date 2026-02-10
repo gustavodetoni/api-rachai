@@ -74,7 +74,7 @@ public class ExpenseController {
     @GetMapping("/expense/{groupId}/debts")
     @Operation(
             summary = "Dívidas do usuário",
-            description = "Retorna a lista de dívidas do usuário logado no grupo, agrupadas por pessoa que deve receber",
+            description = "Retorna a lista de dívidas do usuário logado no grupo",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
     public ResponseEntity<UserDebtsResponse> getUserDebts(

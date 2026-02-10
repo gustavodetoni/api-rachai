@@ -31,9 +31,6 @@ public class GetUserDebtsUseCase {
     private final GroupRepository groupRepository;
     private final GroupMemberRepository groupMemberRepository;
 
-    private record Balance(User user, BigDecimal amount) {}
-    private record SimplifiedDebt(User debtor, User creditor, BigDecimal amount) {}
-
     @Transactional(readOnly = true)
     public UserDebtsResponse execute(UUID groupId, UUID userId) {
         Group group = groupRepository.findById(groupId)
@@ -46,79 +43,38 @@ public class GetUserDebtsUseCase {
         groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
                 .orElseThrow(() -> new BusinessException("Usuário não é membro deste grupo", HttpStatus.FORBIDDEN));
 
-        List<GroupMember> members = groupMemberRepository.findByGroupId(groupId);
-        Map<UUID, User> userMap = members.stream()
-                .map(GroupMember::getUser)
-                .collect(Collectors.toMap(User::getId, user -> user));
+        List<ExpenseSplit> unpaidSplits = expenseSplitRepository.findByUserIdAndGroupIdAndPaidFalseWithExpense(userId, groupId);
 
-        Map<User, BigDecimal> balances = new HashMap<>();
-        for (User user : userMap.values()) {
-            balances.put(user, BigDecimal.ZERO);
-        }
+        Map<UUID, List<ExpenseSplit>> splitsByCreditor = unpaidSplits.stream()
+                .collect(Collectors.groupingBy(split -> split.getExpense().getCreatedBy().getId()));
 
-        List<ExpenseSplit> splits = expenseSplitRepository.findByGroupIdAndPaidFalse(groupId);
+        List<DebtResponse> debts = splitsByCreditor.entrySet().stream()
+                .map(entry -> {
+                    UUID creditorId = entry.getKey();
+                    List<ExpenseSplit> splits = entry.getValue();
+                    String creditorName = splits.get(0).getExpense().getCreatedBy().getName();
+                    String creditorPix = splits.get(0).getExpense().getCreatedBy().getPixKey();
 
-        for (ExpenseSplit split : splits) {
-            User payer = split.getExpense().getCreatedBy();
-            User ower = split.getUser();
-            BigDecimal amount = split.getAmount();
+                    BigDecimal totalAmount = splits.stream()
+                            .map(ExpenseSplit::getAmount)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-            if (!payer.equals(ower)) {
-                balances.merge(payer, amount, BigDecimal::add);
-                balances.merge(ower, amount.negate(), BigDecimal::add);
-            }
-        }
+                    List<UUID> expenseSplitIds = splits.stream()
+                            .map(ExpenseSplit::getId)
+                            .collect(Collectors.toList());
 
-        List<Balance> creditors = new ArrayList<>();
-        List<Balance> debtors = new ArrayList<>();
-
-        for (Map.Entry<User, BigDecimal> entry : balances.entrySet()) {
-            int comparison = entry.getValue().compareTo(BigDecimal.ZERO);
-            if (comparison > 0) {
-                creditors.add(new Balance(entry.getKey(), entry.getValue()));
-            } else if (comparison < 0) {
-                debtors.add(new Balance(entry.getKey(), entry.getValue().abs()));
-            }
-        }
-
-        List<SimplifiedDebt> simplifiedDebts = new ArrayList<>();
-        int creditorIndex = 0;
-        int debtorIndex = 0;
-
-        while (creditorIndex < creditors.size() && debtorIndex < debtors.size()) {
-            Balance creditor = creditors.get(creditorIndex);
-            Balance debtor = debtors.get(debtorIndex);
-
-            BigDecimal payment = creditor.amount.min(debtor.amount);
-
-            simplifiedDebts.add(new SimplifiedDebt(debtor.user, creditor.user, payment));
-
-            BigDecimal remainingCreditor = creditor.amount.subtract(payment);
-            BigDecimal remainingDebtor = debtor.amount.subtract(payment);
-
-            creditors.set(creditorIndex, new Balance(creditor.user, remainingCreditor));
-            debtors.set(debtorIndex, new Balance(debtor.user, remainingDebtor));
-
-            if (remainingCreditor.compareTo(BigDecimal.ZERO) == 0) {
-                creditorIndex++;
-            }
-            if (remainingDebtor.compareTo(BigDecimal.ZERO) == 0) {
-                debtorIndex++;
-            }
-        }
-
-        List<DebtResponse> userDebts = simplifiedDebts.stream()
-                .filter(debt -> debt.debtor.getId().equals(userId))
-                .map(debt -> DebtResponse.builder()
-                        .userId(debt.creditor.getId())
-                        .userName(debt.creditor.getName())
-                        .userPix(debt.creditor.getPixKey())
-                        .totalAmount(debt.amount)
-                        .build())
+                    return DebtResponse.builder()
+                            .userId(creditorId)
+                            .userName(creditorName)
+                            .userPix(creditorPix)
+                            .totalAmount(totalAmount)
+                            .expenseSplitIds(expenseSplitIds)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         return UserDebtsResponse.builder()
-                .debts(userDebts)
+                .debts(debts)
                 .build();
     }
 }
