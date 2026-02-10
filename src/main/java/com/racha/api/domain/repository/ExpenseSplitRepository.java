@@ -8,7 +8,9 @@ import java.util.UUID;
 
 public interface ExpenseSplitRepository {
     ExpenseSplit save(ExpenseSplit expenseSplit);
-    
+
+    <S extends ExpenseSplit> List<S> saveAll(Iterable<S> entities);
+
     Optional<ExpenseSplit> findById(UUID id);
     
     List<ExpenseSplit> findByUserIdAndGroupId(UUID userId, UUID groupId);
@@ -21,6 +23,10 @@ public interface ExpenseSplitRepository {
     
     List<ExpenseSplit> findByUserIdAndGroupIdAndPaidFalseWithExpense(UUID userId, UUID groupId);
     
+    List<ExpenseSplit> findByGroupIdAndPaidFalse(UUID groupId);
+
+    List<ExpenseSplit> findUnpaidSplitsBetweenUsers(UUID groupId, UUID debtorId, UUID creditorId);
+
     Optional<ExpenseSplit> findByIdWithUser(UUID id);
 }
 

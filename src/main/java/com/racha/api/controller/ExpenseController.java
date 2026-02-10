@@ -8,6 +8,7 @@ import com.racha.api.dto.expense.UserDebtsResponse;
 import com.racha.api.usecase.expense.CreateExpenseUseCase;
 import com.racha.api.usecase.expense.GetGroupSummaryUseCase;
 import com.racha.api.usecase.expense.GetUserDebtsUseCase;
+import com.racha.api.usecase.expense.SettleDebtsUseCase;
 import com.racha.api.usecase.expense.UpdateExpenseSplitUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,6 +33,7 @@ public class ExpenseController {
     private final GetGroupSummaryUseCase getGroupSummaryUseCase;
     private final GetUserDebtsUseCase getUserDebtsUseCase;
     private final UpdateExpenseSplitUseCase updateExpenseSplitUseCase;
+    private final SettleDebtsUseCase settleDebtsUseCase;
     private final AuthenticationUtil authenticationUtil;
 
     @PostMapping("/expense/{groupId}")
@@ -47,6 +49,8 @@ public class ExpenseController {
 
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
         ExpenseResponse response = createExpenseUseCase.execute(groupId, request, userId);
+
+        settleDebtsUseCase.execute(groupId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

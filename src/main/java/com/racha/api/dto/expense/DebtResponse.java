@@ -6,18 +6,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class DebtResponse {
     private UUID userId;
     private String userName;
     private String userPix;
     private BigDecimal totalAmount;
-    private List<UUID> expenseSplitIds;
 }
 
