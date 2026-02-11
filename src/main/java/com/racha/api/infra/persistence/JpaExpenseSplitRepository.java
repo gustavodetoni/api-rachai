@@ -43,7 +43,7 @@ public interface JpaExpenseSplitRepository extends JpaRepository<ExpenseSplit, U
     List<ExpenseSplit> findUnpaidSplitsBetweenUsers(@Param("groupId") UUID groupId, @Param("debtorId") UUID debtorId, @Param("creditorId") UUID creditorId);
 
     @Override
-    @Query("SELECT es FROM ExpenseSplit es JOIN FETCH es.user WHERE es.id = :id AND es.deletedAt IS NULL")
+    @Query("SELECT es FROM ExpenseSplit es JOIN FETCH es.user JOIN FETCH es.expense e JOIN FETCH e.createdBy WHERE es.id = :id AND es.deletedAt IS NULL")
     Optional<ExpenseSplit> findByIdWithUser(@Param("id") UUID id);
 }
 

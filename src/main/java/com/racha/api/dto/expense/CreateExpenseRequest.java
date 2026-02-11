@@ -1,5 +1,6 @@
 package com.racha.api.dto.expense;
 
+import com.racha.api.domain.enumeration.CategoryExpense;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -22,6 +23,8 @@ public class CreateExpenseRequest {
     @NotNull(message = "Valor da despesa é obrigatório")
     @Positive(message = "Valor deve ser positivo")
     private BigDecimal amount;
+
+    private CategoryExpense category;
 
     private List<UUID> divideTo;
 }

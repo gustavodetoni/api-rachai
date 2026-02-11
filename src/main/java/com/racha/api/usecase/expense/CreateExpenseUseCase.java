@@ -73,6 +73,7 @@ public class CreateExpenseUseCase {
                 .createdBy(user)
                 .title(request.getTitle())
                 .amount(request.getAmount())
+                .category(request.getCategory().name())
                 .build();
 
         expense = expenseRepository.save(expense);

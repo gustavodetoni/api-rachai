@@ -1,5 +1,7 @@
 package com.racha.api.domain.entity;
 
+import com.racha.api.domain.enumeration.CategoryExpense;
+import com.racha.api.domain.enumeration.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +13,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "expenses")
+@Table(name = "transactions")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Expense {
+public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -27,38 +29,27 @@ public class Expense {
     private Group group;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", nullable = false)
-    private User createdBy;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TransactionType type;
 
     @Column(nullable = false)
-    private String title;
-
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal amount;
-
-    @Column(name = "category")
     private String category;
 
-    private String invoice;
+    @Column(nullable = false)
+    private String name;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal amount;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
     }
 }
-

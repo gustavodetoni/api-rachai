@@ -5,11 +5,14 @@ import com.racha.api.dto.expense.ExpenseResponse;
 import com.racha.api.dto.expense.GroupSummaryResponse;
 import com.racha.api.dto.expense.UpdateExpenseSplitRequest;
 import com.racha.api.dto.expense.UserDebtsResponse;
+import com.racha.api.domain.enumeration.TransactionType;
+import com.racha.api.expection.BusinessException;
 import com.racha.api.usecase.expense.CreateExpenseUseCase;
 import com.racha.api.usecase.expense.GetGroupSummaryUseCase;
 import com.racha.api.usecase.expense.GetUserDebtsUseCase;
 import com.racha.api.usecase.expense.SettleDebtsUseCase;
 import com.racha.api.usecase.expense.UpdateExpenseSplitUseCase;
+import com.racha.api.usecase.transaction.CreateTransactionUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -34,6 +37,7 @@ public class ExpenseController {
     private final GetUserDebtsUseCase getUserDebtsUseCase;
     private final UpdateExpenseSplitUseCase updateExpenseSplitUseCase;
     private final SettleDebtsUseCase settleDebtsUseCase;
+    private final CreateTransactionUseCase createTransactionUseCase;
     private final AuthenticationUtil authenticationUtil;
 
     @PostMapping("/expense/{groupId}")
@@ -51,6 +55,15 @@ public class ExpenseController {
         ExpenseResponse response = createExpenseUseCase.execute(groupId, request, userId);
 
         settleDebtsUseCase.execute(groupId);
+
+        createTransactionUseCase.execute(
+                groupId,
+                userId,
+                TransactionType.EXPENSE,
+                request.getCategory().toString(),
+                request.getTitle(),
+                request.getAmount()
+        );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
