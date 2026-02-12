@@ -27,7 +27,7 @@ public interface JpaExpenseSplitRepository extends JpaRepository<ExpenseSplit, U
     List<ExpenseSplit> findByExpenseId(@Param("expenseId") UUID expenseId);
 
     @Override
-    @Query("SELECT es FROM ExpenseSplit es JOIN es.expense e WHERE e.group.id = :groupId AND e.createdBy.id = :createdByUserId AND es.user.id != :createdByUserId AND es.paid = false AND es.deletedAt IS NULL AND e.deletedAt IS NULL")
+    @Query("SELECT es FROM ExpenseSplit es JOIN FETCH es.user u JOIN es.expense e WHERE e.group.id = :groupId AND e.createdBy.id = :createdByUserId AND es.user.id != :createdByUserId AND es.paid = false AND es.deletedAt IS NULL AND e.deletedAt IS NULL")
     List<ExpenseSplit> findByGroupIdAndExpenseCreatedByAndPaidFalse(@Param("groupId") UUID groupId, @Param("createdByUserId") UUID createdByUserId);
 
     @Override

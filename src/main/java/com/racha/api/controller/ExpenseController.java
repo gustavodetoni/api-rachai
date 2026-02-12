@@ -5,11 +5,13 @@ import com.racha.api.dto.expense.ExpenseResponse;
 import com.racha.api.dto.expense.GroupSummaryResponse;
 import com.racha.api.dto.expense.UpdateExpenseSplitRequest;
 import com.racha.api.dto.expense.UserDebtsResponse;
+import com.racha.api.dto.expense.UserReceivableDto; // New Import
 import com.racha.api.domain.enumeration.TransactionType;
 import com.racha.api.expection.BusinessException;
 import com.racha.api.usecase.expense.CreateExpenseUseCase;
 import com.racha.api.usecase.expense.GetGroupSummaryUseCase;
 import com.racha.api.usecase.expense.GetUserDebtsUseCase;
+import com.racha.api.usecase.expense.GetUserReceivablesUseCase; // New Import
 import com.racha.api.usecase.expense.SettleDebtsUseCase;
 import com.racha.api.usecase.expense.UpdateExpenseSplitUseCase;
 import com.racha.api.usecase.transaction.CreateTransactionUseCase;
@@ -24,6 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List; // New Import
 import java.util.UUID;
 
 @RestController
@@ -39,6 +42,7 @@ public class ExpenseController {
     private final SettleDebtsUseCase settleDebtsUseCase;
     private final CreateTransactionUseCase createTransactionUseCase;
     private final AuthenticationUtil authenticationUtil;
+    private final GetUserReceivablesUseCase getUserReceivablesUseCase; // New Injection
 
     @PostMapping("/expense/{groupId}")
     @Operation(
@@ -98,6 +102,21 @@ public class ExpenseController {
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
         UserDebtsResponse response = getUserDebtsUseCase.execute(groupId, userId);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/expense/{groupId}/receivables")
+    @Operation(
+            summary = "Valores a receber do usuário",
+            description = "Retorna a lista de valores que o usuário logado tem a receber de outros membros no grupo.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<List<UserReceivableDto>> getUserReceivables(
+            @PathVariable UUID groupId,
+            HttpServletRequest httpRequest) {
+
+        UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
+        List<UserReceivableDto> response = getUserReceivablesUseCase.execute(groupId, userId);
         return ResponseEntity.ok(response);
     }
 

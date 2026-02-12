@@ -1,7 +1,7 @@
 package com.racha.api.controller;
 
-import com.racha.api.domain.entity.User;
 import com.racha.api.dto.user.EditUserRequest;
+import com.racha.api.dto.user.UserResponse;
 import com.racha.api.usecase.user.EditUserUseCase;
 import com.racha.api.usecase.user.GetUserUseCase;
 import com.racha.api.util.AuthenticationUtil;
@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -32,10 +31,10 @@ public class UserController {
             description = "Informações sobre meu usuário",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
-    public ResponseEntity<User> getUser(HttpServletRequest request) {
+    public ResponseEntity<UserResponse> getUser(HttpServletRequest request) {
         UUID userId = authenticationUtil.getUserIdFromRequest(request);
-        Optional<User> user = getUserUseCase.execute(userId);
-        return ResponseEntity.ok(user.orElse(null));
+        UserResponse user = getUserUseCase.execute(userId);
+        return ResponseEntity.ok(user);
     }
 
     @PutMapping("/user")
@@ -44,12 +43,12 @@ public class UserController {
             description = "Edita as informações do usuário autenticado",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
-    public ResponseEntity<User> editUser(
+    public ResponseEntity<UserResponse> editUser(
             HttpServletRequest request,
             @RequestBody EditUserRequest editRequest
     ) {
         UUID userId = authenticationUtil.getUserIdFromRequest(request);
-        User user = editUserUseCase.execute(userId, editRequest);
+        UserResponse user = editUserUseCase.execute(userId, editRequest);
         return ResponseEntity.ok(user);
     }
 }

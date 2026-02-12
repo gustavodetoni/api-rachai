@@ -3,6 +3,7 @@ package com.racha.api.usecase.user;
 import com.racha.api.domain.entity.User;
 import com.racha.api.domain.repository.UserRepository;
 import com.racha.api.dto.user.EditUserRequest;
+import com.racha.api.dto.user.UserResponse;
 import com.racha.api.expection.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +17,7 @@ public class EditUserUseCase {
 
     private final UserRepository userRepository;
 
-    public User execute(UUID userId, EditUserRequest request) {
+    public UserResponse execute(UUID userId, EditUserRequest request) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
@@ -39,6 +40,13 @@ public class EditUserUseCase {
             user.setPixKey(request.pixKey());
         }
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return UserResponse.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .thumbnail(user.getThumbnail())
+                .pixKey(user.getPixKey())
+                .build();
     }
 }

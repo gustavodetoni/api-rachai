@@ -39,20 +39,16 @@ public class GetGroupSummaryUseCase {
         groupMemberRepository.findByGroupIdAndUserId(groupId, userId)
                 .orElseThrow(() -> new BusinessException("Usuário não é membro deste grupo", HttpStatus.FORBIDDEN));
 
-        // Total gasto: soma de todas as expenses do grupo (não deletadas)
         List<Expense> expenses = expenseRepository.findByGroupId(groupId);
         BigDecimal totalSpent = expenses.stream()
                 .map(Expense::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Total a receber: soma dos expense_splits onde o expense foi criado pelo usuário logado
-        // mas o split é de outro usuário e não foi pago
         List<ExpenseSplit> splitsToReceive = expenseSplitRepository.findByGroupIdAndExpenseCreatedByAndPaidFalse(groupId, userId);
         BigDecimal totalToReceive = splitsToReceive.stream()
                 .map(ExpenseSplit::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Total a pagar: soma dos expense_splits do usuário onde paid = false
         List<ExpenseSplit> unpaidSplits = expenseSplitRepository.findByUserIdAndGroupIdAndPaidFalse(userId, groupId);
         BigDecimal totalToPay = unpaidSplits.stream()
                 .map(ExpenseSplit::getAmount)
