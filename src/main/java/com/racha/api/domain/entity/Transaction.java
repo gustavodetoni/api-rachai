@@ -39,6 +39,9 @@ public class Transaction {
     @Column(nullable = false)
     private String category;
 
+    @Column(name = "expense_id")
+    private UUID expenseId;
+
     @Column(nullable = false)
     private String name;
 

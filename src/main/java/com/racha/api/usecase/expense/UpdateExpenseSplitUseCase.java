@@ -53,7 +53,8 @@ public class UpdateExpenseSplitUseCase {
                     TransactionType.PAYMENT,
                     "Você pagou",
                     receiver.getName(),
-                    expenseSplit.getAmount()
+                    expenseSplit.getAmount(),
+                    expenseSplit.getExpense().getId()
             );
 
             createTransactionUseCase.execute(
@@ -62,7 +63,8 @@ public class UpdateExpenseSplitUseCase {
                     TransactionType.RECEIVE,
                     "Você recebeu",
                     payer.getName(),
-                    expenseSplit.getAmount()
+                    expenseSplit.getAmount(),
+                    expenseSplit.getExpense().getId()
             );
 
         } else {

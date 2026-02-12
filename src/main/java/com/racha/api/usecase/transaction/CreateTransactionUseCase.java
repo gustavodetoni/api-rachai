@@ -31,7 +31,8 @@ public class CreateTransactionUseCase {
             TransactionType type,
             String category,
             String name,
-            BigDecimal amount
+            BigDecimal amount,
+            UUID expenseId
     ) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException("Group not found with ID: " + groupId));
@@ -46,6 +47,7 @@ public class CreateTransactionUseCase {
                 .category(category)
                 .name(name)
                 .amount(amount)
+                .expenseId(expenseId)
                 .build();
 
         return transactionRepository.save(transaction);

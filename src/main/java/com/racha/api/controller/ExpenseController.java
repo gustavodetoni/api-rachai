@@ -62,7 +62,8 @@ public class ExpenseController {
                 TransactionType.EXPENSE,
                 request.getCategory().toString(),
                 request.getTitle(),
-                request.getAmount()
+                request.getAmount(),
+                response.getId()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

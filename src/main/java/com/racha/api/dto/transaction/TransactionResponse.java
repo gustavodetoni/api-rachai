@@ -16,6 +16,7 @@ public class TransactionResponse {
     private UUID userId;
     private TransactionType type;
     private String category;
+    private UUID expenseId;
     private String name;
     private BigDecimal amount;
     private LocalDateTime createdAt;

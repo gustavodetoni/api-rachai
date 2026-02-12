@@ -18,7 +18,7 @@ public class GetTransactionsByGroupUseCase {
     private final TransactionRepository transactionRepository;
 
     public List<TransactionResponse> execute(UUID groupId, UUID authenticatedUserId) {
-        List<Transaction> allTransactions = transactionRepository.findByGroupId(groupId);
+        List<Transaction> allTransactions = transactionRepository.findByGroupIdOrderByCreatedAtDesc(groupId);
 
         return allTransactions.stream()
                 .filter(transaction ->
@@ -37,6 +37,7 @@ public class GetTransactionsByGroupUseCase {
                 .userId(transaction.getUser().getId())
                 .type(transaction.getType())
                 .category(transaction.getCategory() != null ? transaction.getCategory() : null)
+                .expenseId(transaction.getExpenseId())
                 .name(transaction.getName())
                 .amount(transaction.getAmount())
                 .createdAt(transaction.getCreatedAt())

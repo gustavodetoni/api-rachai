@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface TransactionRepository {
     Transaction save(Transaction transaction);
-    List<Transaction> findByGroupId(UUID groupId);
+    List<Transaction> findByGroupIdOrderByCreatedAtDesc(UUID groupId);
 }
