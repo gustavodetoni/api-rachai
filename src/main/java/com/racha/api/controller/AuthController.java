@@ -1,7 +1,19 @@
 package com.racha.api.controller;
 
-import com.racha.api.dto.auth.*;
-import com.racha.api.usecase.auth.*;
+import com.racha.api.dto.auth.LoginRequest;
+import com.racha.api.dto.auth.LoginResponse;
+import com.racha.api.dto.auth.MessageResponse;
+import com.racha.api.dto.auth.ProvisionalResetPasswordRequest;
+import com.racha.api.dto.auth.RegisterRequest;
+import com.racha.api.dto.auth.ResetPasswordConfirmRequest;
+import com.racha.api.dto.auth.ResetPasswordRequest;
+import com.racha.api.dto.auth.ValidateResetCodeRequest;
+import com.racha.api.usecase.auth.ConfirmPasswordResetUseCase;
+import com.racha.api.usecase.auth.LoginUseCase;
+import com.racha.api.usecase.auth.ProvisionalResetPasswordUseCase;
+import com.racha.api.usecase.auth.RegisterUseCase;
+import com.racha.api.usecase.auth.RequestPasswordResetUseCase;
+import com.racha.api.usecase.auth.ValidateResetCodeUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -21,6 +33,7 @@ public class AuthController {
     private final RequestPasswordResetUseCase requestPasswordResetUseCase;
     private final ValidateResetCodeUseCase validateResetCodeUseCase;
     private final ConfirmPasswordResetUseCase confirmPasswordResetUseCase;
+    private final ProvisionalResetPasswordUseCase provisionalResetPasswordUseCase;
 
     @PostMapping("/login")
     @Operation(summary = "Realizar login", description = "Autentica um usuário e retorna tokens de acesso")
@@ -54,6 +67,13 @@ public class AuthController {
     @Operation(summary = "Confirmar reset de senha", description = "Redefine a senha usando o código validado")
     public ResponseEntity<MessageResponse> confirmPasswordReset(@Valid @RequestBody ResetPasswordConfirmRequest request) {
         confirmPasswordResetUseCase.execute(request);
+        return ResponseEntity.ok(new MessageResponse("Senha redefinida com sucesso"));
+    }
+
+    @PostMapping("/reset-password/provisor")
+    @Operation(summary = "Reset de senha provisório", description = "Redefine a senha diretamente usando email e nova senha (USO INTERNO)")
+    public ResponseEntity<MessageResponse> provisionalResetPassword(@Valid @RequestBody ProvisionalResetPasswordRequest request) {
+        provisionalResetPasswordUseCase.execute(request);
         return ResponseEntity.ok(new MessageResponse("Senha redefinida com sucesso"));
     }
 }
