@@ -48,7 +48,7 @@ jwt:
 
 app:
   frontend:
-    url: http://localhost:3000
+    url: http://10.0.0.111:8081
 
 aws:
   s3:

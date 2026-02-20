@@ -24,7 +24,7 @@ public class GetGroupMembersUseCase {
     private final GroupMemberRepository groupMemberRepository;
 
     @Transactional(readOnly = true)
-    public List<UserResponse> execute(UUID groupId) {
+    public List<UserResponse> execute(UUID groupId, UUID userId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new BusinessException("Grupo não encontrado", HttpStatus.NOT_FOUND));
 
@@ -35,6 +35,9 @@ public class GetGroupMembersUseCase {
         List<GroupMember> groupMembers = groupMemberRepository.findByGroupId(groupId);
 
         return groupMembers.stream()
+                .filter(groupMember ->
+                        !groupMember.getUser().getId().equals(userId)
+                )
                 .map(groupMember -> {
                     User user = groupMember.getUser();
                     return UserResponse.builder()
@@ -44,6 +47,6 @@ public class GetGroupMembersUseCase {
                             .pixKey(user.getPixKey())
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 }

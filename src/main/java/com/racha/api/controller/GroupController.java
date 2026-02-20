@@ -68,8 +68,9 @@ public class GroupController {
             description = "Membros do grupo determinado",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
-    public ResponseEntity<List<UserResponse>> getMembersByGroup(HttpServletRequest request, @PathVariable UUID groupId) {
-        List<UserResponse> members = getGroupMembersUseCase.execute(groupId);
+    public ResponseEntity<List<UserResponse>> getMembersByGroup(HttpServletRequest httpRequest, @PathVariable UUID groupId) {
+        UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
+        List<UserResponse> members = getGroupMembersUseCase.execute(groupId, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(members);
     }
