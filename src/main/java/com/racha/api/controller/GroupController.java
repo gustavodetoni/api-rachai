@@ -2,10 +2,13 @@ package com.racha.api.controller;
 
 import com.racha.api.dto.user.UserResponse;
 import com.racha.api.dto.group.CreateGroupRequest;
+import com.racha.api.dto.group.EditGroupRequest;
 import com.racha.api.dto.group.GroupResponse;
 import com.racha.api.usecase.group.CreateGroupUseCase;
+import com.racha.api.usecase.group.EditGroupUseCase;
 import com.racha.api.usecase.group.GetGroupMembersUseCase;
 import com.racha.api.usecase.group.GetGroupUseCase;
+import com.racha.api.usecase.group.LeaveOrDeleteGroupUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -18,6 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.multipart.MultipartFile;
+import java.beans.PropertyEditorSupport;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,9 +34,21 @@ import java.util.UUID;
 public class GroupController {
 
     private final CreateGroupUseCase createGroupUseCase;
+    private final EditGroupUseCase editGroupUseCase;
     private final GetGroupUseCase getGroupUseCase;
     private final GetGroupMembersUseCase getGroupMembersUseCase;
+    private final LeaveOrDeleteGroupUseCase leaveOrDeleteGroupUseCase;
     private final AuthenticationUtil authenticationUtil;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(MultipartFile.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                setValue(null);
+            }
+        });
+    }
 
     @GetMapping("/groups")
     @Operation(
@@ -61,6 +79,23 @@ public class GroupController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PutMapping(path = "/groups/{groupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(
+            summary = "Editar grupo",
+            description = "Edita um grupo existente. Apenas os campos enviados serão atualizados.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<GroupResponse> editGroup(
+            @PathVariable UUID groupId,
+            @ModelAttribute EditGroupRequest request,
+            HttpServletRequest httpRequest) {
+
+        UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
+        GroupResponse response = editGroupUseCase.execute(groupId, request, userId);
+
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/groups/{groupId}/members")
     @Operation(
             summary = "Buscar membros de um grupo determinado",
@@ -72,5 +107,17 @@ public class GroupController {
         List<UserResponse> members = getGroupMembersUseCase.execute(groupId, userId);
 
         return ResponseEntity.status(HttpStatus.OK).body(members);
+    }
+
+    @DeleteMapping("/groups/{groupId}")
+    @Operation(
+            summary = "Sair ou deletar grupo",
+            description = "Se o usuário for o dono, o grupo é deletado. Se não, o usuário sai do grupo.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<Void> leaveOrDeleteGroup(@PathVariable UUID groupId, HttpServletRequest request) {
+        UUID userId = authenticationUtil.getUserIdFromRequest(request);
+        leaveOrDeleteGroupUseCase.execute(groupId, userId);
+        return ResponseEntity.noContent().build();
     }
 }
