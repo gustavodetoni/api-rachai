@@ -21,6 +21,10 @@ public interface JpaGroupMemberRepository extends JpaRepository<GroupMember, UUI
     List<GroupMember> findByGroupId(@Param("groupId") UUID groupId);
 
     @Override
+    @Query("SELECT gm FROM GroupMember gm WHERE gm.group.id = :groupId AND gm.user.id = :userId")
+    Optional<GroupMember> findByGroupIdAndUserIdIncludeDeleted(@Param("groupId") UUID groupId, @Param("userId") UUID userId);
+
+    @Override
     @Query("SELECT COUNT(gm) > 0 FROM GroupMember gm WHERE gm.group.id = :groupId AND gm.user.id = :userId AND gm.deletedAt IS NULL")
     boolean existsByGroupIdAndUserId(@Param("groupId") UUID groupId, @Param("userId") UUID userId);
 }

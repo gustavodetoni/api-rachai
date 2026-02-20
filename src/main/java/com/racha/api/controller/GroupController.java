@@ -1,13 +1,16 @@
 package com.racha.api.controller;
 
-import com.racha.api.dto.user.UserResponse;
+import com.racha.api.dto.auth.MessageResponse;
 import com.racha.api.dto.group.CreateGroupRequest;
 import com.racha.api.dto.group.EditGroupRequest;
 import com.racha.api.dto.group.GroupResponse;
+import com.racha.api.dto.user.UserResponse;
 import com.racha.api.usecase.group.CreateGroupUseCase;
 import com.racha.api.usecase.group.EditGroupUseCase;
+import com.racha.api.usecase.group.GenerateGroupInviteUseCase;
 import com.racha.api.usecase.group.GetGroupMembersUseCase;
 import com.racha.api.usecase.group.GetGroupUseCase;
+import com.racha.api.usecase.group.JoinGroupByInviteUseCase;
 import com.racha.api.usecase.group.LeaveOrDeleteGroupUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,6 +41,8 @@ public class GroupController {
     private final GetGroupUseCase getGroupUseCase;
     private final GetGroupMembersUseCase getGroupMembersUseCase;
     private final LeaveOrDeleteGroupUseCase leaveOrDeleteGroupUseCase;
+    private final GenerateGroupInviteUseCase generateGroupInviteUseCase;
+    private final JoinGroupByInviteUseCase joinGroupByInviteUseCase;
     private final AuthenticationUtil authenticationUtil;
 
     @InitBinder
@@ -119,5 +124,29 @@ public class GroupController {
         UUID userId = authenticationUtil.getUserIdFromRequest(request);
         leaveOrDeleteGroupUseCase.execute(groupId, userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/groups/{groupId}/invite")
+    @Operation(
+            summary = "Gerar convite de grupo",
+            description = "Gera um token de convite válido por 24 horas para o grupo.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<MessageResponse> generateInvite(@PathVariable UUID groupId, HttpServletRequest request) {
+        UUID userId = authenticationUtil.getUserIdFromRequest(request);
+        String token = generateGroupInviteUseCase.execute(groupId, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(token));
+    }
+
+    @PostMapping("/groups/join/{token}")
+    @Operation(
+            summary = "Entrar no grupo via convite",
+            description = "Adiciona o usuário ao grupo usando um token de convite válido.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<MessageResponse> joinGroup(@PathVariable String token, HttpServletRequest request) {
+        UUID userId = authenticationUtil.getUserIdFromRequest(request);
+        joinGroupByInviteUseCase.execute(token, userId);
+        return ResponseEntity.ok(new MessageResponse("Entrou no grupo com sucesso"));
     }
 }

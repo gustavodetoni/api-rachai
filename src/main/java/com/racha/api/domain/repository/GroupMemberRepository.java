@@ -13,5 +13,7 @@ public interface GroupMemberRepository {
 
     List<GroupMember> findByGroupId(UUID groupId);
 
+    Optional<GroupMember> findByGroupIdAndUserIdIncludeDeleted(UUID groupId, UUID userId);
+
     boolean existsByGroupIdAndUserId(UUID groupId, UUID userId);
 }
