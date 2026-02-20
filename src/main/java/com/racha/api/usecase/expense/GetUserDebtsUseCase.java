@@ -2,8 +2,6 @@ package com.racha.api.usecase.expense;
 
 import com.racha.api.domain.entity.ExpenseSplit;
 import com.racha.api.domain.entity.Group;
-import com.racha.api.domain.entity.GroupMember;
-import com.racha.api.domain.entity.User;
 import com.racha.api.domain.repository.ExpenseSplitRepository;
 import com.racha.api.domain.repository.GroupMemberRepository;
 import com.racha.api.domain.repository.GroupRepository;
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

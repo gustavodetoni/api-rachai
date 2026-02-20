@@ -2,10 +2,7 @@ package com.racha.api.service;
 
 import com.racha.api.config.auth.JwtTokenProvider;
 import com.racha.api.domain.entity.User;
-import com.racha.api.expection.BusinessException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;

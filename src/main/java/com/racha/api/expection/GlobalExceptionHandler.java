@@ -99,13 +99,13 @@ public class GlobalExceptionHandler {
         log.error("MaxUploadSizeExceededException: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.PAYLOAD_TOO_LARGE.value())
+                .status(HttpStatus.CONTENT_TOO_LARGE.value())
                 .error("Payload Too Large")
                 .message("Arquivo excede o tamanho máximo permitido")
                 .path(request.getDescription(false).replace("uri=", ""))
                 .build();
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.PAYLOAD_TOO_LARGE);
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONTENT_TOO_LARGE);
     }
 
     @ExceptionHandler(org.springframework.web.HttpMediaTypeNotSupportedException.class)

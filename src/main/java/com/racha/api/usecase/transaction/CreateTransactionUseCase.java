@@ -3,7 +3,6 @@ package com.racha.api.usecase.transaction;
 import com.racha.api.domain.entity.Group;
 import com.racha.api.domain.entity.Transaction;
 import com.racha.api.domain.entity.User;
-import com.racha.api.domain.enumeration.CategoryExpense;
 import com.racha.api.domain.enumeration.TransactionType;
 import com.racha.api.domain.repository.GroupRepository;
 import com.racha.api.domain.repository.TransactionRepository;

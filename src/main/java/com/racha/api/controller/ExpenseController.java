@@ -5,13 +5,12 @@ import com.racha.api.dto.expense.ExpenseResponse;
 import com.racha.api.dto.expense.GroupSummaryResponse;
 import com.racha.api.dto.expense.UpdateExpenseSplitRequest;
 import com.racha.api.dto.expense.UserDebtsResponse;
-import com.racha.api.dto.expense.UserReceivableDto; // New Import
+import com.racha.api.dto.expense.UserReceivableDto; 
 import com.racha.api.domain.enumeration.TransactionType;
-import com.racha.api.expection.BusinessException;
 import com.racha.api.usecase.expense.CreateExpenseUseCase;
 import com.racha.api.usecase.expense.GetGroupSummaryUseCase;
 import com.racha.api.usecase.expense.GetUserDebtsUseCase;
-import com.racha.api.usecase.expense.GetUserReceivablesUseCase; // New Import
+import com.racha.api.usecase.expense.GetUserReceivablesUseCase; 
 import com.racha.api.usecase.expense.SettleDebtsUseCase;
 import com.racha.api.usecase.expense.UpdateExpenseSplitUseCase;
 import com.racha.api.usecase.transaction.CreateTransactionUseCase;
@@ -26,7 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List; // New Import
+import java.util.List; 
 import java.util.UUID;
 
 @RestController
@@ -42,7 +41,7 @@ public class ExpenseController {
     private final SettleDebtsUseCase settleDebtsUseCase;
     private final CreateTransactionUseCase createTransactionUseCase;
     private final AuthenticationUtil authenticationUtil;
-    private final GetUserReceivablesUseCase getUserReceivablesUseCase; // New Injection
+    private final GetUserReceivablesUseCase getUserReceivablesUseCase;
 
     @PostMapping("/expense/{groupId}")
     @Operation(

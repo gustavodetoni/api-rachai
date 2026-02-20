@@ -1,6 +1,5 @@
 package com.racha.api.domain.entity;
 
-import com.racha.api.domain.enumeration.CategoryExpense;
 import com.racha.api.domain.enumeration.TransactionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
