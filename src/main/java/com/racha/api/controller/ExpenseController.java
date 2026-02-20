@@ -3,16 +3,16 @@ package com.racha.api.controller;
 import com.racha.api.dto.expense.CreateExpenseRequest;
 import com.racha.api.dto.expense.ExpenseResponse;
 import com.racha.api.dto.expense.GroupSummaryResponse;
-import com.racha.api.dto.expense.UpdateExpenseSplitRequest;
+import com.racha.api.dto.expense.SettleExpenseSplitsRequest;
 import com.racha.api.dto.expense.UserDebtsResponse;
-import com.racha.api.dto.expense.UserReceivableDto; 
+import com.racha.api.dto.expense.UserReceivableDto;
 import com.racha.api.domain.enumeration.TransactionType;
 import com.racha.api.usecase.expense.CreateExpenseUseCase;
 import com.racha.api.usecase.expense.GetGroupSummaryUseCase;
 import com.racha.api.usecase.expense.GetUserDebtsUseCase;
-import com.racha.api.usecase.expense.GetUserReceivablesUseCase; 
+import com.racha.api.usecase.expense.GetUserReceivablesUseCase;
 import com.racha.api.usecase.expense.SettleDebtsUseCase;
-import com.racha.api.usecase.expense.UpdateExpenseSplitUseCase;
+import com.racha.api.usecase.expense.SettleExpenseSplitsUseCase;
 import com.racha.api.usecase.transaction.CreateTransactionUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,7 +38,7 @@ public class ExpenseController {
     private final CreateExpenseUseCase createExpenseUseCase;
     private final GetGroupSummaryUseCase getGroupSummaryUseCase;
     private final GetUserDebtsUseCase getUserDebtsUseCase;
-    private final UpdateExpenseSplitUseCase updateExpenseSplitUseCase;
+    private final SettleExpenseSplitsUseCase settleExpenseSplitsUseCase;
     private final SettleDebtsUseCase settleDebtsUseCase;
     private final CreateTransactionUseCase createTransactionUseCase;
     private final AuthenticationUtil authenticationUtil;
@@ -120,19 +120,18 @@ public class ExpenseController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping(path = "/expense/split/{expenseSplitId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/expense/settle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
-            summary = "Atualizar expense split",
-            description = "Atualiza o status de pagamento de um expense split. O usuário pode enviar um comprovante opcional.",
+            summary = "Pagar dívidas",
+            description = "Marca uma lista de expense splits como pagos de uma vez, associando o mesmo comprovante a todos.",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
-    public ResponseEntity<Void> updateExpenseSplit(
-            @PathVariable UUID expenseSplitId,
-            @ModelAttribute UpdateExpenseSplitRequest request,
+    public ResponseEntity<Void> settleExpenseSplits(
+            @ModelAttribute SettleExpenseSplitsRequest request,
             HttpServletRequest httpRequest) {
 
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
-        updateExpenseSplitUseCase.execute(expenseSplitId, request, userId);
+        settleExpenseSplitsUseCase.execute(request, userId);
 
         return ResponseEntity.noContent().build();
     }
