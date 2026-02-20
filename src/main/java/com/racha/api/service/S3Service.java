@@ -92,4 +92,16 @@ public class S3Service {
                         contentType.equals("image/webp")
         );
     }
+
+    public boolean isValidDocumentFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return false;
+        }
+
+        String contentType = file.getContentType();
+        return contentType != null && (
+                contentType.equals("application/pdf") ||
+                        isValidImageFile(file)
+        );
+    }
 }

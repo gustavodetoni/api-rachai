@@ -22,6 +22,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,7 +44,7 @@ public class ExpenseController {
     private final AuthenticationUtil authenticationUtil;
     private final GetUserReceivablesUseCase getUserReceivablesUseCase;
 
-    @PostMapping("/expense/{groupId}")
+    @PostMapping(path = "/expense/{groupId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "Criar despesa",
             description = "Cria uma nova despesa no grupo. Se divideTo for vazio, divide entre todos os membros. Caso contrário, divide apenas entre o usuário logado e os IDs fornecidos.",
@@ -51,7 +52,7 @@ public class ExpenseController {
     )
     public ResponseEntity<ExpenseResponse> createExpense(
             @PathVariable UUID groupId,
-            @Valid @RequestBody CreateExpenseRequest request,
+            @Valid @ModelAttribute CreateExpenseRequest request,
             HttpServletRequest httpRequest) {
 
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
@@ -119,15 +120,15 @@ public class ExpenseController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/expense/split/{expenseSplitId}")
+    @PutMapping(path = "/expense/split/{expenseSplitId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(
             summary = "Atualizar expense split",
-            description = "Atualiza o status de pagamento de um expense split. O usuário só pode atualizar seus próprios expense splits.",
+            description = "Atualiza o status de pagamento de um expense split. O usuário pode enviar um comprovante opcional.",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
     public ResponseEntity<Void> updateExpenseSplit(
             @PathVariable UUID expenseSplitId,
-            @Valid @RequestBody UpdateExpenseSplitRequest request,
+            @ModelAttribute UpdateExpenseSplitRequest request,
             HttpServletRequest httpRequest) {
 
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);

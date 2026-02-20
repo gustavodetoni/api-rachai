@@ -13,10 +13,12 @@ import com.racha.api.domain.repository.UserRepository;
 import com.racha.api.dto.expense.CreateExpenseRequest;
 import com.racha.api.dto.expense.ExpenseResponse;
 import com.racha.api.expection.BusinessException;
+import com.racha.api.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -35,6 +37,7 @@ public class CreateExpenseUseCase {
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final GroupMemberRepository groupMemberRepository;
+    private final S3Service s3Service;
 
     @Transactional
     public ExpenseResponse execute(UUID groupId, CreateExpenseRequest request, UUID userId) {
@@ -68,12 +71,22 @@ public class CreateExpenseUseCase {
             }
         }
 
+        String invoiceUrl = null;
+        MultipartFile file = request.getInvoice();
+        if (file != null && !file.isEmpty()) {
+            if (!s3Service.isValidDocumentFile(file)) {
+                throw new BusinessException("Arquivo deve ser uma imagem válida ou PDF", HttpStatus.BAD_REQUEST);
+            }
+            invoiceUrl = s3Service.uploadFile(file, "expenses/invoices");
+        }
+
         Expense expense = Expense.builder()
                 .group(group)
                 .createdBy(user)
                 .title(request.getTitle())
                 .amount(request.getAmount())
                 .category(request.getCategory().name())
+                .invoice(invoiceUrl)
                 .build();
 
         expense = expenseRepository.save(expense);

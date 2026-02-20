@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.web.multipart.MultipartFile;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,5 +29,7 @@ public class CreateExpenseRequest {
     private CategoryExpense category;
 
     private List<UUID> divideTo;
+
+    private MultipartFile invoice;
 }
 
