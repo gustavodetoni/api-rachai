@@ -8,6 +8,7 @@ import com.racha.api.dto.user.UserResponse;
 import com.racha.api.usecase.group.CreateGroupUseCase;
 import com.racha.api.usecase.group.EditGroupUseCase;
 import com.racha.api.usecase.group.GenerateGroupInviteUseCase;
+import com.racha.api.usecase.group.GetGroupInviteUseCase;
 import com.racha.api.usecase.group.GetGroupMembersUseCase;
 import com.racha.api.usecase.group.GetGroupUseCase;
 import com.racha.api.usecase.group.JoinGroupByInviteUseCase;
@@ -42,6 +43,7 @@ public class GroupController {
     private final GetGroupMembersUseCase getGroupMembersUseCase;
     private final LeaveOrDeleteGroupUseCase leaveOrDeleteGroupUseCase;
     private final GenerateGroupInviteUseCase generateGroupInviteUseCase;
+    private final GetGroupInviteUseCase getGroupInviteUseCase;
     private final JoinGroupByInviteUseCase joinGroupByInviteUseCase;
     private final AuthenticationUtil authenticationUtil;
 
@@ -136,6 +138,18 @@ public class GroupController {
         UUID userId = authenticationUtil.getUserIdFromRequest(request);
         String token = generateGroupInviteUseCase.execute(groupId, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse(token));
+    }
+
+    @GetMapping("/groups/{groupId}/invite")
+    @Operation(
+            summary = "Buscar convite válido do grupo",
+            description = "Retorna o token de convite válido mais recente do grupo, ou vazio se não houver.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<MessageResponse> getInvite(@PathVariable UUID groupId, HttpServletRequest request) {
+        UUID userId = authenticationUtil.getUserIdFromRequest(request);
+        MessageResponse response = getGroupInviteUseCase.execute(groupId, userId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/groups/join/{token}")
