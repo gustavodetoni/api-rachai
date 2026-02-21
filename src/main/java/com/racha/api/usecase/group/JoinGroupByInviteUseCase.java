@@ -27,7 +27,7 @@ public class JoinGroupByInviteUseCase {
     private final UserRepository userRepository;
 
     @Transactional
-    public void execute(String token, UUID userId) {
+    public UUID execute(String token, UUID userId) {
         GroupInvite invite = groupInviteRepository.findByToken(token)
                 .orElseThrow(() -> new BusinessException("Convite inválido ou não encontrado", HttpStatus.NOT_FOUND));
 
@@ -61,5 +61,7 @@ public class JoinGroupByInviteUseCase {
 
             groupMemberRepository.save(newMember);
         }
+        
+        return group.getId();
     }
 }

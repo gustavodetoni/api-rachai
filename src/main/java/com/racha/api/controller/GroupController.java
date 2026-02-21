@@ -4,6 +4,7 @@ import com.racha.api.dto.auth.MessageResponse;
 import com.racha.api.dto.group.CreateGroupRequest;
 import com.racha.api.dto.group.EditGroupRequest;
 import com.racha.api.dto.group.GroupResponse;
+import com.racha.api.dto.group.JoinGroupResponse;
 import com.racha.api.dto.user.UserResponse;
 import com.racha.api.usecase.group.CreateGroupUseCase;
 import com.racha.api.usecase.group.EditGroupUseCase;
@@ -158,9 +159,12 @@ public class GroupController {
             description = "Adiciona o usuário ao grupo usando um token de convite válido.",
             security = @SecurityRequirement(name = "Bearer Authentication")
     )
-    public ResponseEntity<MessageResponse> joinGroup(@PathVariable String token, HttpServletRequest request) {
+    public ResponseEntity<JoinGroupResponse> joinGroup(@PathVariable String token, HttpServletRequest request) {
         UUID userId = authenticationUtil.getUserIdFromRequest(request);
-        joinGroupByInviteUseCase.execute(token, userId);
-        return ResponseEntity.ok(new MessageResponse("Entrou no grupo com sucesso"));
+        UUID groupId = joinGroupByInviteUseCase.execute(token, userId);
+        return ResponseEntity.ok(JoinGroupResponse.builder()
+                .groupId(groupId)
+                .message("Entrou no grupo com sucesso")
+                .build());
     }
 }
