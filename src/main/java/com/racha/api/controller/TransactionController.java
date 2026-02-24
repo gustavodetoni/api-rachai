@@ -1,6 +1,8 @@
 package com.racha.api.controller;
 
+import com.racha.api.dto.transaction.TransactionDetailResponse;
 import com.racha.api.dto.transaction.TransactionResponse;
+import com.racha.api.usecase.transaction.GetTransactionDetailUseCase;
 import com.racha.api.usecase.transaction.GetTransactionsByGroupUseCase;
 import com.racha.api.util.AuthenticationUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +27,7 @@ public class TransactionController {
 
     private final AuthenticationUtil authenticationUtil;
     private final GetTransactionsByGroupUseCase getTransactionsByGroupUseCase;
+    private final GetTransactionDetailUseCase getTransactionDetailUseCase;
 
     @GetMapping("/transaction/{groupId}")
     @Operation(
@@ -38,6 +41,21 @@ public class TransactionController {
 
         UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
         List<TransactionResponse> response = getTransactionsByGroupUseCase.execute(groupId, userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/transaction/detail/{transactionId}")
+    @Operation(
+            summary = "Detalhes da transação",
+            description = "Retorna os detalhes completos de uma transação, incluindo divisões de despesas e comprovantes se houver.",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
+    public ResponseEntity<TransactionDetailResponse> getTransactionDetail(
+            @PathVariable UUID transactionId,
+            HttpServletRequest httpRequest) {
+
+        UUID userId = authenticationUtil.getUserIdFromRequest(httpRequest);
+        TransactionDetailResponse response = getTransactionDetailUseCase.execute(transactionId, userId);
         return ResponseEntity.ok(response);
     }
 }

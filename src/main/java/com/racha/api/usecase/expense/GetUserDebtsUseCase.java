@@ -50,6 +50,7 @@ public class GetUserDebtsUseCase {
                     List<ExpenseSplit> splits = entry.getValue();
                     String creditorName = splits.get(0).getExpense().getCreatedBy().getName();
                     String creditorPix = splits.get(0).getExpense().getCreatedBy().getPixKey();
+                    String creditorThumbnail = splits.get(0).getExpense().getCreatedBy().getThumbnail();
 
                     BigDecimal totalAmount = splits.stream()
                             .map(ExpenseSplit::getAmount)
@@ -65,6 +66,7 @@ public class GetUserDebtsUseCase {
                             .userPix(creditorPix)
                             .totalAmount(totalAmount)
                             .expenseSplitIds(expenseSplitIds)
+                            .userThumbnail(creditorThumbnail)
                             .build();
                 })
                 .collect(Collectors.toList());

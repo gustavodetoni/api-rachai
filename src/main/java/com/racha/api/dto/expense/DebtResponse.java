@@ -15,5 +15,6 @@ public class DebtResponse {
     private String userName;
     private String userPix;
     private BigDecimal totalAmount;
+    private String userThumbnail;
 }
 
