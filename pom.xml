@@ -10,9 +10,9 @@
 	</parent>
 	<groupId>com.racha</groupId>
 	<artifactId>api</artifactId>
-	<version>0.1.0</version>
-	<name>api</name>
-	<description>Demo project for Spring Boot</description>
+	<version>1.0.0</version>
+	<name>api-rachai</name>
+	<description>API Gerenciador de divisão de contas em grupos</description>
 	<url/>
 	<licenses>
 		<license/>

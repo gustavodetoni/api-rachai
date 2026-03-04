@@ -1,5 +1,6 @@
 package com.racha.api.config.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -12,6 +13,9 @@ import java.util.List;
 @Configuration
 public class CorsConfig {
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -20,7 +24,8 @@ public class CorsConfig {
                 "http://localhost:3000",
                 "http://127.0.0.1:8081",
                 "http://127.0.0.1:3000",
-                "http://10.0.0.111:8081"
+                "http://10.0.0.111:8081",
+                frontendUrl
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));

@@ -40,7 +40,7 @@ spring:
       max-request-size: 10MB
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 jwt:
   secret: sua-chave-secreta-muito-segura-aqui-com-no-minimo-256-bits-para-maior-seguranca
@@ -48,16 +48,16 @@ jwt:
 
 app:
   frontend:
-    url: http://10.0.0.111:8081
+    url: http://10.0.0.111:3000
 
 aws:
   s3:
-    bucket-name: rachai-bucket
-    region: us-east-1
-    access-key: minio
-    secret-key: minio123
-    endpoint: http://localhost:9000 # minIO apenas
-    base-url: http://localhost:9000/rachai-bucket
+    bucket-name: rachai
+    region: auto
+    access-key: d4a5b74eb299082dc5e45b946c97cbdf
+    secret-key: d6e06e3161a75aada09bc2b2ab4de5cc726e839402750a05dcb71591de45d507
+    endpoint: https://92e108a6bcc0ec31208d45be38bc2f85.r2.cloudflarestorage.com
+    base-url: https://pub-ecef1c7865fd4810b3cd01c00f8ec69e.r2.dev
 
 springdoc:
   api-docs:
