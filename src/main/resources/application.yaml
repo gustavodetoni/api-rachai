@@ -3,9 +3,9 @@ spring:
     name: rachai-api
 
   datasource:
-    url: jdbc:postgresql://localhost:5444/racha
-    username: postgres
-    password: postgres
+    url: ${DB_URL:jdbc:postgresql://localhost:5444/racha}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -22,10 +22,10 @@ spring:
     locations: classpath:db/migration
 
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: seu-email@gmail.com
-    password: sua-senha-de-app
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:seu-email@gmail.com}
+    password: ${MAIL_PASSWORD:sua-senha-de-app}
     properties:
       mail:
         smtp:
@@ -43,21 +43,21 @@ server:
   port: ${PORT:8080}
 
 jwt:
-  secret: sua-chave-secreta-muito-segura-aqui-com-no-minimo-256-bits-para-maior-seguranca
-  expiration: 86400000
+  secret: ${JWT_SECRET:sua-chave-secreta-muito-segura-aqui-com-no-minimo-256-bits-para-maior-seguranca}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 app:
   frontend:
-    url: http://10.0.0.111:3000
+    url: ${FRONTEND_URL:http://10.0.0.111:3000}
 
 aws:
   s3:
-    bucket-name: rachai
-    region: auto
-    access-key: d4a5b74eb299082dc5e45b946c97cbdf
-    secret-key: d6e06e3161a75aada09bc2b2ab4de5cc726e839402750a05dcb71591de45d507
-    endpoint: https://92e108a6bcc0ec31208d45be38bc2f85.r2.cloudflarestorage.com
-    base-url: https://pub-ecef1c7865fd4810b3cd01c00f8ec69e.r2.dev
+    bucket-name: ${S3_BUCKET_NAME:rachai}
+    region: ${S3_REGION:auto}
+    access-key: ${S3_ACCESS_KEY:d4a5b74eb299082dc5e45b946c97cbdf}
+    secret-key: ${S3_SECRET_KEY:d6e06e3161a75aada09bc2b2ab4de5cc726e839402750a05dcb71591de45d507}
+    endpoint: ${S3_ENDPOINT:https://92e108a6bcc0ec31208d45be38bc2f85.r2.cloudflarestorage.com}
+    base-url: ${S3_BASE_URL:https://pub-ecef1c7865fd4810b3cd01c00f8ec69e.r2.dev}
 
 springdoc:
   api-docs:
